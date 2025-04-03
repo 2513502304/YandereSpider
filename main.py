@@ -4,7 +4,7 @@ import asyncio
 
 async def main() -> None:
     post = posts()
-    await post.download(limit=1000, all_page=True, tags='k-on! horiguchi_yukiko')
+    await post.download(limit=1000, all_page=True, tags='k-on!')
 
 
 if __name__ == "__main__":

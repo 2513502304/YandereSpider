@@ -30,7 +30,7 @@ class yandere:
 
     async def download_file(self, urls: pd.Series, directory: str) -> None:
         """
-        下载文件到指定目录
+        下载文件到指定目录，忽略已存在的文件
 
         Args:
             urls (pd.Series): 文件 URLs
@@ -39,6 +39,12 @@ class yandere:
         # 创建目录
         if not os.path.exists(directory):
             os.makedirs(directory)
+        # 若存在已有文件，则将其过滤
+        else:
+            # 获取已有文件列表
+            files = os.listdir(directory)
+            # 过滤已有文件
+            urls = urls[~urls.apply(lambda x: os.path.basename(x) in files)]
         # 检查 URLs 是否为空
         if urls.empty:
             return
@@ -216,8 +222,10 @@ class posts(yandere):
         posts = await self.list(limit=limit, start_page=start_page, end_page=end_page, all_page=all_page, tags=tags)
         # 帖子 URLs
         urls = posts['file_url']
+        # 存储文件路径
+        path = f'./downloads/posts/{tags}'
         # 下载文件
-        await self.download_file(urls, f'./downloads/posts/{tags}')
+        await self.download_file(urls, path)
 
 
 class tags(yandere):
@@ -631,8 +639,10 @@ class pools(yandere):
             posts = await self.list_posts(id=id, start_page=start_page, end_page=end_page, all_page=all_page)
             # 获取帖子 URLs
             urls = posts['file_url']
+            # 存储文件路径
+            path = f'./downloads/pools/{name}'
             # 下载文件
-            await self.download_file(urls, f'./downloads/pools/{name}')
+            await self.download_file(urls, path)
 
 
 class favorites(yandere):
