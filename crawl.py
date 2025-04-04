@@ -1,6 +1,7 @@
 from utils import logger
 
 from fake_useragent import UserAgent
+from urllib.parse import quote, unquote
 import httpx
 
 from aiofiles import os as aioos
@@ -62,6 +63,36 @@ class yandere:
             # 保存文件
             async with aiofiles.open(filename, 'wb') as f:
                 await f.write(response.content)
+
+    @staticmethod
+    def parse_url(url: str) -> str:
+        """
+        解析文件链接 URL，并将其转换为用户可读的规范化名称
+
+        Args:
+            url (str): 文件 URL
+
+        Returns:
+            str: 用户可读的规范化名称
+            
+        Example:
+            帖子链接：https://yande.re/post/show/1023280  
+            帖子标签：horiguchi_yukiko k-on! akiyama_mio hirasawa_yui kotobuki_tsumugi nakano_azusa tainaka_ritsu cleavage disc_cover dress summer_dress screening  
+            帖子下载链接：https://files.yande.re/image/c0abd1a95b5e9f9ed845e24ffb0f663d/yande.re%201023280%20akiyama_mio%20cleavage%20disc_cover%20dress%20hirasawa_yui%20horiguchi_yukiko%20k-on%21%20kotobuki_tsumugi%20nakano_azusa%20screening%20summer_dress%20tainaka_ritsu.jpg  
+            
+            处理过程：
+            - 获取帖子下载链接的基础名称（即帖子下载链接的最后一个组件）：yande.re%201023280%20akiyama_mio%20cleavage%20disc_cover%20dress%20hirasawa_yui%20horiguchi_yukiko%20k-on%21%20kotobuki_tsumugi%20nakano_azusa%20screening%20summer_dress%20tainaka_ritsu.jpg
+            - 解码经过 url 编码后的基础名称：yande.re 1023280 akiyama_mio cleavage disc_cover dress hirasawa_yui horiguchi_yukiko k-on! kotobuki_tsumugi nakano_azusa screening summer_dress tainaka_ritsu.jpg
+        
+        Note:
+            - yandere 文件命名规则为：yande.re {帖子 ID} {按照 a-z 排序后的标签}.文件后缀名
+            - 永远不要使用该方法返回的规范化名称作为存储文件的文件名，因为解码经过 url 编码后的基础名称中，可能包含非法字符（在按照 a-z 排序后的标签中，可能包含 ： < > : " / \ | ? * 等 Windows 系统中的非法字符，从而引发 OSError: [WinError 123] 文件名、目录名或卷标语法不正确）
+        """
+        # 帖子下载链接的基础名称
+        basename = os.path.basename(url)
+        # 解码 url 编码后的基础名称（此步骤等同于将 %20 解码为空格，将 %21 解码为 !）
+        decoded_basename = unquote(basename)  # basename.replace('%20', ' ').replace('%21', '!')
+        return decoded_basename
 
 
 class posts(yandere):
