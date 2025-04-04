@@ -90,8 +90,8 @@ class yandere:
         """
         # 帖子下载链接的基础名称
         basename = os.path.basename(url)
-        # 解码 url 编码后的基础名称（此步骤等同于将 %20 解码为空格，将 %21 解码为 !）
-        decoded_basename = unquote(basename)  # basename.replace('%20', ' ').replace('%21', '!')
+        # 解码 url 编码后的基础名称
+        decoded_basename = unquote(basename)
         return decoded_basename
 
 
