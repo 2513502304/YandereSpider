@@ -1,10 +1,18 @@
-from crawl import yandere, posts, tags, artists, comments, wiki, notes, users, forum, pools, favorites
+from crawl import Yandere, Posts, Tags, Artists, Comments, Wiki, Notes, Users, Forum, Pools, Favorites
+from utils import logger
 import asyncio
+import time
 
 
 async def main() -> None:
-    post = posts()
-    await post.download(limit=1000, all_page=True, tags='k-on!')
+    start = time.time()
+    pool = Pools()
+    await pool.download(
+        all_page=True,
+        query='k-on!',
+    )
+    end = time.time()
+    logger.info(f"Total time taken: {end - start:.2f} seconds")
 
 
 if __name__ == "__main__":
