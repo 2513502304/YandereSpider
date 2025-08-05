@@ -235,7 +235,7 @@ class Posts(Yandere):
 
         Args:
             limit (int, optional): 您想检索多少篇帖子。每次请求的帖子数量有一个硬性限制，最多 1000 篇. Defaults to 40.
-            tags (str, optional): 要搜索的标签。任何在网站上有效的标签组合在这里都有效。这包括所有元标签。要组合的不同标签使用空格连接，同一标签中的空格使用 _ 替换. Defaults to ''.
+            tags (str, optional): 要搜索的标签。任何在网站上有效的标签组合在这里都有效。这包括所有元标签。要组合的不同标签使用空格连接，同一标签中的空格使用 _ 替换. Defaults to ''. 表示搜索全站
 
         Returns:
             int: html 分页器中的最大页码，实际的最大页码会大于等于该页码
@@ -343,7 +343,7 @@ class Posts(Yandere):
             start_page (int, optional): 查询起始页码. Defaults to 1.
             end_page (int, optional): 查询结束页码. Defaults to 1.
             all_page (bool, optional): 是否获取当前查询标签下所有页码的帖子列表，若为 True，则忽略 start_page 与 end_page 参数. Defaults to False.
-            tags (str, optional): 要搜索的标签。任何在网站上有效的标签组合在这里都有效。这包括所有元标签。要组合的不同标签使用空格连接，同一标签中的空格使用 _ 替换. Defaults to ''.
+            tags (str, optional): 要搜索的标签。任何在网站上有效的标签组合在这里都有效。这包括所有元标签。要组合的不同标签使用空格连接，同一标签中的空格使用 _ 替换. Defaults to ''. 表示搜索全站
             concurrency (int, optional): 并发下载的数量. Defaults to 8.
 
         Returns:
@@ -447,7 +447,7 @@ class Posts(Yandere):
             start_page (int, optional): 查询起始页码. Defaults to 1.
             end_page (int, optional): 查询结束页码. Defaults to 1.
             all_page (bool, optional): 是否获取当前查询标签下所有页码的帖子列表，若为 True，则忽略 start_page 与 end_page 参数. Defaults to False.
-            tags (str, optional): 要搜索的标签。任何在网站上有效的标签组合在这里都有效。这包括所有元标签。要组合的不同标签使用空格连接，同一标签中的空格使用 _ 替换. Defaults to ''.
+            tags (str, optional): 要搜索的标签。任何在网站上有效的标签组合在这里都有效。这包括所有元标签。要组合的不同标签使用空格连接，同一标签中的空格使用 _ 替换. Defaults to ''. 表示搜索全站
         """
         # 获取当前查询标签下所有页码的帖子列表中的帖子
         posts = await self.list(
@@ -646,7 +646,7 @@ class Pools(Yandere):
 
     async def list_pools_page(
         self,
-        query: str,
+        query: str = '',
     ) -> int:
         """
         使用定位 html 分页器的方式，获取指定标签帖子列表的最大页码
@@ -655,12 +655,12 @@ class Pools(Yandere):
             对于 pool 页面，由于不存在 Hidden Posts 策略（rating:e, blacklists .etc），实际的最大页码会等于该页码
 
         Args:
-            query (str): 查询标题
+            query (str): 查询标题. Defaults to ''. 表示搜索全站
             
         Returns:
             int: html 分页器中的最大页码，实际的最大页码等于该页码
         """
-        url = '/pool.json'
+        url = '/pool'
         headers = {
             'User-Agent': UserAgent().random,
         }
@@ -683,7 +683,7 @@ class Pools(Yandere):
 
     async def list_pools(
         self,
-        query: str,
+        query: str = '',
         start_page: int = 1,
         end_page: int = 1,
         all_page: bool = False,
@@ -717,7 +717,7 @@ class Pools(Yandere):
         获取在起始页码与结束页码范围内，指定标题的图集列表；若 all_page 为 True，则获取当前查询标题下所有页码的图集列表
 
         Args:
-            query (str): 查询标题
+            query (str): 查询标题. Defaults to ''. 表示搜索全站
             start_page (int, optional): 查询起始页码. Defaults to 1.
             end_page (int, optional): 查询结束页码. Defaults to 1.
             all_page (bool, optional): 是否获取当前查询标题下所有页码的图集列表，若为 True，则忽略 start_page 与 end_page 参数. Defaults to False.
@@ -945,7 +945,7 @@ class Pools(Yandere):
 
     async def download(
         self,
-        query: str,
+        query: str = '',
         start_page: int = 1,
         end_page: int = 1,
         all_page: bool = False,
@@ -954,7 +954,7 @@ class Pools(Yandere):
         下载在起始页码与结束页码范围内，指定标题的图集列表中的帖子；若 all_page 为 True，则下载当前查询标题下所有页码的图集列表中的帖子
 
         Args:
-            query (str): 查询标题
+            query (str): 查询标题. Defaults to ''. 表示搜索全站
             start_page (int, optional): 查询起始页码. Defaults to 1.
             end_page (int, optional): 查询结束页码. Defaults to 1.
             all_page (bool, optional): 是否下载当前查询标题下所有页码的图集列表中的帖子，若为 True，则忽略 start_page 与 end_page 参数. Defaults to False.
