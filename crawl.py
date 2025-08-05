@@ -771,14 +771,15 @@ class Pools(Yandere):
         Note: 
             对于 pool/show 页面，由于不存在 Hidden Posts 策略（rating:e, blacklists .etc），实际的最大页码会等于该页码
             实际上，pool/show 页面默认不以分页策略展示，所有内容均在一页中展示，因此该函数永远返回 1；若需要分页策略，需点击页面最下方的 "Index View" 按钮，对于 id 为 1746 的图集，将跳转至 /post?tags=pool%3A1746 访问（即 /post?tags=pool:1746）
-
+            id 参数是必须的，否则访问 https://yande.re/pool/show 或 https://yande.re/pool/show.json 是会自动跳转回 https://yande.re/pool/ 页面，并弹出 Can't find pool with id 0 提示
+            
         Args:
             id (int): 图集的 ID 号码
             
         Returns:
             int: html 分页器中的最大页码，实际的最大页码等于该页码
         """
-        url = '/pool/show.json'
+        url = '/pool/show'
         headers = {
             'User-Agent': UserAgent().random,
         }
@@ -815,6 +816,7 @@ class Pools(Yandere):
         Note:
             修订 API 参考文件: https://yande.re/help/api: If you don't specify any parameters you'll get a list of all pools. 将其更改为：If you don't specify any parameters you'll get a list of pool which id is 0.
             图集支持批量下载，需点击页面最下方的 "Download" 按钮，对于 id 为 1746 的图集，将跳转至 /pool/zip/1746 访问，但需要用户登录后才能下载
+            id 参数是必须的，否则访问 https://yande.re/pool/show 或 https://yande.re/pool/show.json 是会自动跳转回 https://yande.re/pool/ 页面，并弹出 Can't find pool with id 0 提示
 
         - id: The pool id number.
         - page: The page.
