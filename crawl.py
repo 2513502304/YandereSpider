@@ -459,6 +459,7 @@ class Posts(Yandere):
             end_page=end_page,
             all_page=all_page,
             tags=tags,
+            concurrency=concurrency,
         )
         # 帖子 URLs
         urls = posts['file_url']
@@ -972,6 +973,7 @@ class Pools(Yandere):
             start_page=start_page,
             end_page=end_page,
             all_page=all_page,
+            concurrency=concurrency,
         )
         # 图集 id
         ids = pools['id']
@@ -985,6 +987,7 @@ class Pools(Yandere):
                 start_page=start_page,
                 end_page=end_page,
                 all_page=all_page,
+                concurrency=concurrency,
             )
             # 获取帖子 URLs
             urls = posts['file_url']
