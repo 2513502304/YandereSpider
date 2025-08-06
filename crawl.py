@@ -171,7 +171,7 @@ class Yandere:
             tasks.append(self.fetch_page(
                 api,
                 headers=headers,
-                params=params,
+                params=params.copy(),
                 semaphore=semaphore,
                 callback=callback,
                 **kwargs,
@@ -231,7 +231,8 @@ class Posts(Yandere):
         使用定位 html 分页器的方式，获取指定标签帖子列表的最大页码
         
         Note: 
-            对于 post 页面，返回的 html 分页器中的最大页码由于 yande.re 网站中的某些 Hidden Posts 策略（rating:e, blacklists .etc），实际的最大页码会大于等于该页码
+            对于 post 页面，返回的 html 分页器中的最大页码由于 yande.re 网站中的某些 Hidden Posts 策略（rating:e, blacklists .etc），实际的最大页码会大于等于该页码  
+            yande.re post 页面展示策略受 limit 参数影响，会自动根据 limit 参数与实际帖子数量调整 html 分页器中的最大页码
 
         Args:
             limit (int, optional): 您想检索多少篇帖子。每次请求的帖子数量有一个硬性限制，最多 1000 篇. Defaults to 40.
@@ -438,6 +439,7 @@ class Posts(Yandere):
         end_page: int = 1,
         all_page: bool = False,
         tags: str = '',
+        concurrency: int = 8,
     ) -> None:
         """
         下载在起始页码与结束页码范围内，指定标签的帖子列表中的帖子；若 all_page 为 True，则下载当前查询标签下所有页码的帖子列表中的帖子
@@ -448,6 +450,7 @@ class Posts(Yandere):
             end_page (int, optional): 查询结束页码. Defaults to 1.
             all_page (bool, optional): 是否获取当前查询标签下所有页码的帖子列表，若为 True，则忽略 start_page 与 end_page 参数. Defaults to False.
             tags (str, optional): 要搜索的标签。任何在网站上有效的标签组合在这里都有效。这包括所有元标签。要组合的不同标签使用空格连接，同一标签中的空格使用 _ 替换. Defaults to ''. 表示搜索全站
+            concurrency (int, optional): 并发下载的数量. Defaults to 8.
         """
         # 获取当前查询标签下所有页码的帖子列表中的帖子
         posts = await self.list(
@@ -462,7 +465,7 @@ class Posts(Yandere):
         # 存储文件路径
         path = f'./downloads/posts/{tags}'
         # 下载文件
-        await self.concurrent_download_file(urls, path)
+        await self.concurrent_download_file(urls, path, concurrency=concurrency)
 
 
 class Tags(Yandere):
@@ -655,8 +658,8 @@ class Pools(Yandere):
             对于 pool 页面，由于不存在 Hidden Posts 策略（rating:e, blacklists .etc），实际的最大页码会等于该页码
 
         Args:
-            query (str): 查询标题. Defaults to ''. 表示搜索全站
-            
+            query (str, optional): 查询标题. Defaults to ''. 表示搜索全站
+
         Returns:
             int: html 分页器中的最大页码，实际的最大页码等于该页码
         """
@@ -717,7 +720,7 @@ class Pools(Yandere):
         获取在起始页码与结束页码范围内，指定标题的图集列表；若 all_page 为 True，则获取当前查询标题下所有页码的图集列表
 
         Args:
-            query (str): 查询标题. Defaults to ''. 表示搜索全站
+            query (str, optional): 查询标题. Defaults to ''. 表示搜索全站
             start_page (int, optional): 查询起始页码. Defaults to 1.
             end_page (int, optional): 查询结束页码. Defaults to 1.
             all_page (bool, optional): 是否获取当前查询标题下所有页码的图集列表，若为 True，则忽略 start_page 与 end_page 参数. Defaults to False.
@@ -766,7 +769,7 @@ class Pools(Yandere):
         id: int,
     ) -> int:
         """
-        使用定位 html 分页器的方式，获取指定标签帖子列表的最大页码
+        使用定位 html 分页器的方式，获取指定图集 ID 帖子列表的最大页码
         
         Note: 
             对于 pool/show 页面，由于不存在 Hidden Posts 策略（rating:e, blacklists .etc），实际的最大页码会等于该页码
@@ -815,7 +818,7 @@ class Pools(Yandere):
         
         Note:
             修订 API 参考文件: https://yande.re/help/api: If you don't specify any parameters you'll get a list of all pools. 将其更改为：If you don't specify any parameters you'll get a list of pool which id is 0.
-            图集支持批量下载，需点击页面最下方的 "Download" 按钮，对于 id 为 1746 的图集，将跳转至 /pool/zip/1746 访问，但需要用户登录后才能下载
+            图集支持批量下载，需点击页面最下方的 "Download" 按钮，对于 id 为 1746 的图集，将跳转至 /pool/zip/1746 访问，但需要用户登录后才能下载  
             id 参数是必须的，否则访问 https://yande.re/pool/show 或 https://yande.re/pool/show.json 是会自动跳转回 https://yande.re/pool/ 页面，并弹出 Can't find pool with id 0 提示
 
         - id: The pool id number.
@@ -951,15 +954,17 @@ class Pools(Yandere):
         start_page: int = 1,
         end_page: int = 1,
         all_page: bool = False,
+        concurrency: int = 8,
     ) -> None:
         """
         下载在起始页码与结束页码范围内，指定标题的图集列表中的帖子；若 all_page 为 True，则下载当前查询标题下所有页码的图集列表中的帖子
 
         Args:
-            query (str): 查询标题. Defaults to ''. 表示搜索全站
+            query (str, optional): 查询标题. Defaults to ''. 表示搜索全站
             start_page (int, optional): 查询起始页码. Defaults to 1.
             end_page (int, optional): 查询结束页码. Defaults to 1.
             all_page (bool, optional): 是否下载当前查询标题下所有页码的图集列表中的帖子，若为 True，则忽略 start_page 与 end_page 参数. Defaults to False.
+            concurrency (int, optional): 并发下载的数量. Defaults to 8.
         """
         # 获取当前查询标题下所有页码的图集列表
         pools = await self.list_pools(
@@ -986,7 +991,7 @@ class Pools(Yandere):
             # 存储文件路径
             path = f'./downloads/pools/{name}'
             # 下载文件
-            await self.concurrent_download_file(urls, path)
+            await self.concurrent_download_file(urls, path, concurrency=concurrency)
 
 
 class Favorites(Yandere):
